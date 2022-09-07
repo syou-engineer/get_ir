@@ -17,10 +17,12 @@ class Slack:
         self.send_message += f"IR情報が更新されました。\n\n"
 
     def send(self):
+        webhook = WebhookClient(SLACK_WEBHOOK_URL)
+        response = webhook.send(text="テスト")
         # 更新が無かったらSlackへ送信をしない
-        if self.is_updated:
-            webhook = WebhookClient(SLACK_WEBHOOK_URL)
-            response = webhook.send(text=self.send_message)
+        # if self.is_updated:
+        #     webhook = WebhookClient(SLACK_WEBHOOK_URL)
+        #     response = webhook.send(text=self.send_message)
 
     def show(self):
         """デバッグ用"""
