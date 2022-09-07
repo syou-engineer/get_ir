@@ -2,6 +2,6 @@ beautifulsoup4==4.11.1
 boto3==1.24.65
 pandas==1.4.3
 python-dotenv==0.20.0
-selenium==4.4.0
+selenium==4.1.0
 slack-sdk==3.18.1
 webdriver-manager==3.8.3
