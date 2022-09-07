@@ -31,7 +31,7 @@ class WebScraping:
         # options.add_argument("--homedir=/tmp")
 
         self.driver = webdriver.Chrome(
-            # ChromeDriverManager().install(),
+            ChromeDriverManager().install(),
             options=options
         )
 
