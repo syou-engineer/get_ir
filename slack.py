@@ -4,7 +4,7 @@ from slack_sdk import WebClient
 
 
 # SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
-SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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"
+SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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"
 
 
 class Slack:
