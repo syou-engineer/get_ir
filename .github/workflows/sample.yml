@@ -1,0 +1,27 @@
+name: ir-action
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  # schedule:
+  #   # 定期実行する時間・・・①
+  #   - cron: "0 22 * * *"
+
+jobs:
+  get-ir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.9"
+          architecture: "x64"
+      - name: Get Python version
+        run: python -V
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run Python
+        run: python3 main.py
