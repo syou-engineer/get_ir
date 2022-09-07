@@ -1,4 +1,5 @@
 
+import unicodedata
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -21,16 +22,16 @@ class WebScraping:
     def __init__(self) -> None:
         options = Options()
         options.add_argument("--headless")
-        options.add_argument("--disable-gpu")
-        options.add_argument("--hide-scrollbars")
-        options.add_argument("--single-process")
-        options.add_argument("--ignore-certificate-errors")
-        options.add_argument("--window-size=880x996")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--homedir=/tmp")
+        # options.add_argument("--disable-gpu")
+        # options.add_argument("--hide-scrollbars")
+        # options.add_argument("--single-process")
+        # options.add_argument("--ignore-certificate-errors")
+        # options.add_argument("--window-size=880x996")
+        # options.add_argument("--no-sandbox")
+        # options.add_argument("--homedir=/tmp")
 
         self.driver = webdriver.Chrome(
-            ChromeDriverManager().install(),
+            # ChromeDriverManager().install(),
             options=options
         )
 
@@ -48,16 +49,17 @@ class WebScraping:
 
         data_list = []
         for content in soup.find(class_=target_class).contents:
-            print("--------------------------")
+            # print("--------------------------")
             link = ""
             link = content.find_next("a").get("href")
             re_text = content.get_text().strip()
 
             re_text_list = content.get_text(
-                ',').strip().replace("\n", "").replace("\t", "").split(',')
+                ',').strip().replace("\n", "").replace("\t", "").replace("\xa0", "").split(',')
 
             # ブランクと改行コードのみの要素を配列から削除する
             re_text_list = list(filter(None, re_text_list))
+
             # HTMLの空要素は飛ばす
             if link is None or not re_text:
                 continue
@@ -84,7 +86,7 @@ class WebScraping:
             counter = counter + 1
 
             data_list.append([company_name, date, body, link])
-            print("--------------------------")
+            # print("--------------------------")
 
         f.close()
 
