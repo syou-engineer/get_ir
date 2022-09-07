@@ -18,6 +18,7 @@ class Slack:
 
     def send(self):
         webhook = WebhookClient(SLACK_WEBHOOK_URL)
+
         response = webhook.send(text="テスト")
         # 更新が無かったらSlackへ送信をしない
         # if self.is_updated:
