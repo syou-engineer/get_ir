@@ -101,75 +101,75 @@ if __name__ == '__main__':
     dynamodb = init_dynamodb()
     web_scraping = WebScraping()
     slack = Slack()
+
+    old = ""
+
+    # スクレイピングしたデータをデータフレームに書き込んでいく
+    df = pd.DataFrame(columns=["company_name", "date", "body", "link"])
+
+    for url in url_list:
+        scraping_data = web_scraping.get_ir_info(url[0], url[1], url[2])
+        df_new = pd.DataFrame(scraping_data, columns=[
+            "company_name", "date", "body", "link"])
+        df = pd.concat([df, df_new])
+
+        is_update = False
+        idx = 0
+
+        for data in range(len(df_new)):
+            company_name = df_new.iloc[idx, 0]
+            body = df_new.iloc[idx, 2]
+            link = df_new.iloc[idx, 3]
+            # print(company_name)
+            # print(body)
+            # print(link)
+
+            item = get_item_to_dynamodb(dynamodb, company_name)
+
+            if item:
+                item_body = item["body"]
+                if not item_body == body:
+                    is_update = True
+                    print(f"{company_name}：IRが更新されました。")
+                    print(f"DB：{item_body}")
+                    print(f"スクレイピング：{body}")
+                else:
+                    print(f"{company_name}：IRは更新されていません")
+                    break
+
+            else:
+                # DBにデータのない会社は１件取得でOK
+                is_update = True
+                print(f"{company_name}：IRが更新されました。{body}")
+                break
+
+            if old != company_name:
+                slack.message_heading(company_name)
+                old = company_name
+
+            # 本文が英語なら翻訳してからSlackに送信する
+            # print(body)
+            # print(check_english(
+            #     "today"))
+            # if check_english(body) is not None:
+                # print("翻訳します")
+            # body = translate(body)
+            # Slackに送るメッセージとして追加
+            slack.message_shaping(body, link)
+            idx += 1
+            print("\n")
+
+        # IRが更新されていたら最新のデータだけをDBにセットする
+        if is_update:
+            update_company_name = df_new.iloc[0, 0]
+            update_body = df_new.iloc[0, 2]
+            put_item_to_daynamodb(dynamodb, update_company_name, update_body)
+
+    print("\n")
+    df.to_csv("./result/text.csv")
+    # スクレイピング結果をSlackに投げる
+    slack.show()
     slack.send()
-    # old = ""
-
-    # # スクレイピングしたデータをデータフレームに書き込んでいく
-    # df = pd.DataFrame(columns=["company_name", "date", "body", "link"])
-
-    # for url in url_list:
-    #     scraping_data = web_scraping.get_ir_info(url[0], url[1], url[2])
-    #     df_new = pd.DataFrame(scraping_data, columns=[
-    #         "company_name", "date", "body", "link"])
-    #     df = pd.concat([df, df_new])
-
-    #     is_update = False
-    #     idx = 0
-    #     print(len(df_new))
-    #     for data in range(len(df_new)):
-    #         company_name = df_new.iloc[idx, 0]
-    #         body = df_new.iloc[idx, 2]
-    #         link = df_new.iloc[idx, 3]
-    #         # print(company_name)
-    #         # print(body)
-    #         # print(link)
-
-    #         item = get_item_to_dynamodb(dynamodb, company_name)
-
-    #         if item:
-    #             item_body = item["body"]
-    #             if not item_body == body:
-    #                 is_update = True
-    #                 print(f"{company_name}：IRが更新されました。")
-    #                 print(f"DB：{item_body}")
-    #                 print(f"スクレイピング：{body}")
-    #             else:
-    #                 print(f"{company_name}：IRは更新されていません")
-    #                 break
-
-    #         else:
-    #             # DBにデータのない会社は１件取得でOK
-    #             is_update = True
-    #             print(f"{company_name}：IRが更新されました。{body}")
-    #             break
-
-    #         if old != company_name:
-    #             slack.message_heading(company_name)
-    #             old = company_name
-
-    #         # 本文が英語なら翻訳してからSlackに送信する
-    #         # print(body)
-    #         # print(check_english(
-    #         #     "today"))
-    #         # if check_english(body) is not None:
-    #             # print("翻訳します")
-    #         # body = translate(body)
-    #         # Slackに送るメッセージとして追加
-    #         slack.message_shaping(body, link)
-    #         idx += 1
-    #         print("\n")
-
-    #     # IRが更新されていたら最新のデータだけをDBにセットする
-    #     if is_update:
-    #         update_company_name = df_new.iloc[0, 0]
-    #         update_body = df_new.iloc[0, 2]
-    #         put_item_to_daynamodb(dynamodb, update_company_name, update_body)
-
-    # print("\n")
-    # df.to_csv("./result/text.csv")
-    # # スクレイピング結果をSlackに投げる
-    # slack.show()
-    # slack.send()
-    # web_scraping.close()
+    web_scraping.close()
 
     print("スクレイピングを終了しました")

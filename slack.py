@@ -3,8 +3,7 @@ from slack_sdk.webhook import WebhookClient
 from slack_sdk import WebClient
 
 
-# SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
-SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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"
+SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
 
 
 class Slack:
@@ -19,11 +18,10 @@ class Slack:
     def send(self):
         webhook = WebhookClient(SLACK_WEBHOOK_URL)
 
-        response = webhook.send(text="テスト")
         # 更新が無かったらSlackへ送信をしない
-        # if self.is_updated:
-        #     webhook = WebhookClient(SLACK_WEBHOOK_URL)
-        #     response = webhook.send(text=self.send_message)
+        if self.is_updated:
+            webhook = WebhookClient(SLACK_WEBHOOK_URL)
+            response = webhook.send(text=self.send_message)
 
     def show(self):
         """デバッグ用"""
